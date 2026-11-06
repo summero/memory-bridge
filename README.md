@@ -2,22 +2,41 @@
 
 Memory Bridge is a Hermes Agent plugin for read-only, permission-aware search and reading over a folder of Markdown notes, such as a team's shared agent memory. An operator decides which files each Hermes profile may search and read. The model can only ask questions; it cannot widen what it sees.
 
-**Status:** v0.1.0 packaging candidate; independently reviewed with conditional GO and no public-release blockers; not published or catalog-listed. Two tools, `memory_bridge_search` and `memory_bridge_read`. Tested against synthetic fixtures only.
+**Status:** v0.1.0 packaging candidate; not published or catalog-listed. Two tools, `memory_bridge_search` and `memory_bridge_read`. Tested against synthetic fixtures only. See [Validation status](#validation-status).
 
 ## Compatibility and dependencies
 
-macOS-first, Python 3.11+; successfully tested on Python 3.13.5 and 3.14.9.
-The 3.14.9 result was reported by the independent packaging review; this polish
-pass re-ran the suite on the available 3.13.5 interpreter. Linux is experimental
+macOS-first, Python 3.11+; the suite has passed on Python 3.13.5 and 3.14.9.
+Linux is experimental
 and unsupported pending validation on a real Linux filesystem. Other platforms
 are unsupported. The plugin uses the Python standard library and the operating
 system ACL API; no third-party Python dependencies are required by the plugin.
 Hermes itself has its own dependencies.
 
-Verified Hermes: **v0.22.7**, commit
+Previously verified Hermes: **v0.22.7**, commit
 `b200f5bc60e31588ba2cb60e288029c4a54ba5fa`.
+Latest registry-level validation target: **v0.23.0** (local 2bd378ed1b8d); this
+is not a full re-verification of the v0.22.7 record.
 The manifest minimum is `>=0.22.7`; this is not a guarantee of compatibility
 with every later release. Re-run isolated checks after upgrades.
+
+## Validation status
+
+Completed:
+
+- Hermes v0.23.0 (local 2bd378ed1b8d) on Python 3.14.9: 170 tests passed.
+- Official `hermes plugins doctor . --ci` exited 0 (2 tools, 0 hooks registered, no warnings).
+- Registry-level integration test: with a temporary `HERMES_HOME` and synthetic memory only, tool calls through Hermes's real tool registry gave correct results for authorized search/read, denied and missing paths, traversal, absolute paths, symlink escape, and a second home with no policy.
+
+Simulated only:
+
+- Cron and delegated-subagent refusal were checked by setting the cron session flag and the delegated-child environment marker by hand. This shows the plugin refuses when those signals are present. It does not show that Hermes's real scheduler or `delegate_task` sets them. Real scheduler and delegation execution remain **unverified**.
+
+Not tested:
+
+- No model-driven session has been run; the registry-level test is not an end-to-end session.
+- Memory Bridge has not been installed into a real Hermes profile, and behavior with a running gateway is unknown.
+- The temporary `HERMES_HOME` did not give complete write isolation: Hermes still wrote small files (such as bytecode and lease files) in the real installation. Do not treat the test as proof of zero side effects.
 
 Hermes public plugin interfaces include `ctx.register_tool` and
 `ctx.current_cron_execution`. The tested admission checker also recognizes
@@ -213,6 +232,8 @@ MIT licensed; see [LICENSE](LICENSE). Publication and catalog submission remain
 separate operator decisions.
 
 ## Hermes upgrade checklist
+
+The items below are requirements for future upgrades, not a record of completed tests. See [Validation status](#validation-status) for what has been run so far.
 
 Before enabling Memory Bridge on an upgraded Hermes:
 
