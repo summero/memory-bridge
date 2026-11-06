@@ -1,0 +1,18 @@
+name: memory-bridge
+version: "0.1.0"
+description: "Read-only, permission-aware search and reading of an operator-approved folder of Markdown memory files."
+# Declared explicitly so Hermes never infers another plugin kind from source text.
+kind: standalone
+manifest_version: 2
+api_version: 1
+provides_tools:
+  - memory_bridge_search
+  - memory_bridge_read
+tags: [memory, search, read-only]
+requires_hermes: ">=0.22.7"
+license: MIT
+python_dependencies: []
+requires_env: []
+provides_hooks: []
+# Privileged override capabilities; ordinary tools are declared above.
+capabilities: []
