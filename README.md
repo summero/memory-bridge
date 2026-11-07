@@ -6,7 +6,7 @@ Memory Bridge is a Hermes Agent plugin for read-only, permission-aware search an
 
 ## Compatibility and dependencies
 
-macOS-first, Python 3.11+; the suite has passed on Python 3.13.5 and 3.14.9.
+macOS-first, Python 3.11+; the unit suite has passed on Python 3.13.5.
 Linux is experimental
 and unsupported pending validation on a real Linux filesystem. Other platforms
 are unsupported. The plugin uses the Python standard library and the operating
@@ -15,7 +15,8 @@ Hermes itself has its own dependencies.
 
 Previously verified Hermes: **v0.22.7**, commit
 `b200f5bc60e31588ba2cb60e288029c4a54ba5fa`.
-Latest registry-level validation target: **v0.23.0** (local 2bd378ed1b8d); this
+Latest registry-level validation target: **v0.23.0**, tag commit
+`2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19`; this
 is not a full re-verification of the v0.22.7 record.
 The manifest minimum is `>=0.22.7`; this is not a guarantee of compatibility
 with every later release. Re-run isolated checks after upgrades.
@@ -24,8 +25,8 @@ with every later release. Re-run isolated checks after upgrades.
 
 Completed:
 
-- Hermes v0.23.0 (local 2bd378ed1b8d) on Python 3.14.9: 170 tests passed.
-- Official `hermes plugins doctor . --ci` exited 0 (2 tools, 0 hooks registered, no warnings).
+- Unit suite on Python 3.13.5: 170 tests passed. The suite blocks every Hermes import, so it tests the plugin alone and does not show Hermes compatibility.
+- Official `hermes plugins doctor . --ci` exited 0 (2 tools, 0 hooks registered, no warnings). The separate `validate_plugin_dir` check reports one warning, for the flagged internal dependency at `runtime.py:46` described below.
 - Registry-level integration test: with a temporary `HERMES_HOME` and synthetic memory only, tool calls through Hermes's real tool registry gave correct results for authorized search/read, denied and missing paths, traversal, absolute paths, symlink escape, and a second home with no policy.
 
 Simulated only:
@@ -90,14 +91,20 @@ A full example is in [examples/policy.example.json](examples/policy.example.json
 
 `memory_bridge_search(query, limit)` returns up to `limit` results (default 5, at most 10), each with a document `id` (root-relative path), an optional `title` from the first heading, and a short `snippet`.
 
+With the bundled synthetic notes in `examples/memory` and the example policy, a search for `garden` returns:
+
 ```json
-{"ok": true, "results": [{"id": "projects/garden.md", "title": "Garden Plan", "snippet": "Plant tulips in October…"}], "truncated": false}
+{"ok": true, "results": [
+  {"id": "decisions/watering.md", "title": "Watering decision", "snippet": "# Watering decision Synthetic memory: water the garden at dawn using collected rainwater."},
+  {"id": "projects/garden.md", "title": "Lantern Garden", "snippet": "# Lantern Garden Synthetic memory: plant blue asters beside the east gate. Opening day is April 12."},
+  {"id": "workflows/visit.md", "title": "Garden visit", "snippet": "# Garden visit Synthetic memory: bring a notebook and count the blue asters."}
+], "truncated": false}
 ```
 
 `memory_bridge_read(id)` returns one document by the `id` that search returned. Content is capped at `read_chars` characters (8000 at most). A capped document ends with a visible truncation note and has `"truncated": true`.
 
 ```json
-{"ok": true, "id": "projects/garden.md", "content": "# Garden Plan\n…", "truncated": false}
+{"ok": true, "id": "projects/garden.md", "content": "# Lantern Garden\n\nSynthetic memory: plant blue asters beside the east gate. Opening day is April 12.\n", "truncated": false}
 ```
 
 Read applies the same policy, depth, and filesystem trust rules as search; subsequent changes can revoke access. A document that is denied, outside the allow list, deeper than `max_depth`, a symlink, a hard link, oversized, binary, or simply missing all produce the same `not_found_or_denied` response.
@@ -140,6 +147,8 @@ For **read**, the flag specifically means the returned text was shortened.
    as `plugins/memory-bridge/` (normally `~/.hermes/plugins/memory-bridge/`). Keep
    `plugin.yaml`, `__init__.py`, `acl.py`, `errors.py`, `policy.py`, `reader.py`,
    `runtime.py`, `safe_fs.py`, and `search.py` together. Include LICENSE and README.
+   Leave out `tests/` and `examples/`; they are for review and the synthetic demo,
+   and the plugin does not use them at runtime.
 3. In **each calling profile's home**, create
    `plugin-data/memory-bridge/policy.json` from
    [the example](examples/policy.example.json). Replace `root` with the canonical
