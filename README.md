@@ -30,7 +30,7 @@ with every later release. Re-run isolated checks after upgrades.
 
 Completed:
 
-- Unit suite on Python 3.13.5: 170 tests passed. The suite blocks every Hermes import, so it tests the plugin alone and does not show Hermes compatibility.
+- Unit suite on Python 3.13.5: 176 tests passed. The suite blocks every Hermes import, so it tests the plugin alone and does not show Hermes compatibility.
 - Official `hermes plugins doctor . --ci` exited 0 (2 tools, 0 hooks registered, no warnings). The separate `validate_plugin_dir` check reports one warning, for the flagged internal dependency at `runtime.py:46` described below.
 - Registry-level integration test: with a temporary `HERMES_HOME` and synthetic memory only, tool calls through Hermes's real tool registry gave correct results for authorized search/read, denied and missing paths, traversal, absolute paths, symlink escape, and a second home with no policy.
 
