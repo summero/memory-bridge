@@ -2,7 +2,12 @@
 
 Memory Bridge is a Hermes Agent plugin for read-only, permission-aware search and reading over a folder of Markdown notes, such as a team's shared agent memory. An operator decides which files each Hermes profile may search and read. The model can only ask questions; it cannot widen what it sees.
 
-**Status:** v0.1.0 packaging candidate; not published or catalog-listed. Two tools, `memory_bridge_search` and `memory_bridge_read`. Tested against synthetic fixtures only. See [Validation status](#validation-status).
+**Status:** v0.1.0. Public source: https://github.com/summero/memory-bridge. Not listed in the Hermes plugin catalog and not installable by catalog name. Two tools, `memory_bridge_search` and `memory_bridge_read`. Tested against synthetic fixtures only. See [Availability](#availability) and [Validation status](#validation-status).
+
+## Availability
+
+- **GitHub:** The source is public at https://github.com/summero/memory-bridge. Clone it and record the commit you install.
+- **Hermes plugin catalog:** Not accepted or listed. Catalog listing is a separate maintainer review of a pinned commit. Until a catalog entry is confirmed, install from source using the steps below.
 
 ## Compatibility and dependencies
 
@@ -141,8 +146,14 @@ For **read**, the flag specifically means the returned text was shortened.
 
 ## Install and configure (operator steps)
 
-1. Install Hermes v0.22.7 or newer with Python 3.11+. Obtain and review this
-   source directory. No catalog installation by name is available yet.
+1. Install Hermes v0.22.7 or newer with Python 3.11+. Clone the source and
+   review the commit you use. Installing by catalog name is not available.
+
+   ```sh
+   git clone https://github.com/summero/memory-bridge.git
+   cd memory-bridge
+   git rev-parse HEAD
+   ```
 2. Copy the plugin into the selected Hermes installation's user plugin directory
    as `plugins/memory-bridge/` (normally `~/.hermes/plugins/memory-bridge/`). Keep
    `plugin.yaml`, `__init__.py`, `acl.py`, `errors.py`, `policy.py`, `reader.py`,
@@ -237,8 +248,7 @@ PYTHON="$HOME/.hermes/hermes-agent/venv/bin/python"
 
 ## Package and catalog preparation
 
-MIT licensed; see [LICENSE](LICENSE). Publication and catalog submission remain
-separate operator decisions.
+MIT licensed; see [LICENSE](LICENSE). The GitHub repository makes the source public. A Hermes catalog listing is a separate step that needs maintainer acceptance of a pinned commit, and it has not been confirmed. See [Availability](#availability).
 
 ## Hermes upgrade checklist
 
